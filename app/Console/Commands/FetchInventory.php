@@ -3,6 +3,7 @@
 namespace XurDay\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use XurDay\Lib\XurClient;
 
 class FetchInventory extends Command
@@ -44,6 +45,7 @@ class FetchInventory extends Command
         $client->getInventory();
         $this->info('Inventory successfully cached!');
       } catch(\Exception $e) {
+        Log::error($e);
         $this->error('Unable to fetch inventory.');
       }
 
