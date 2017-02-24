@@ -24,7 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('inventory:fetch --force')->weekly()->fridays()->at('4:00')->timezone('America/Los_Angeles');
+        $schedule->command('inventory:fetch')->weekly()->fridays()->at('4:00')->timezone('America/Los_Angeles');
     }
 
     /**
