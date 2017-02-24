@@ -36,14 +36,18 @@ class XurClient {
     }
 
     $itemHashes = $this->getItemHashes($inventoryHash);
-    foreach($itemHashes as $hashId) {
-      $inventory[] = $this->decodeItemHash($hashId);
+    foreach($itemHashes as $category => $hashes) {
+      foreach($hashes as $itemHash){
+        $inventory[$category][] = [
+          'item' => $this->decodeItemHash($itemHash['itemHash']),
+          'itemCosts' => $itemHash['itemCosts'],
+          'stackSize' => $itemHash['stackSize']
+        ];
+      }
     }
-    $uniqueInventory = array_map('unserialize', array_unique(array_map('serialize', $inventory)));
+    Cache::put('inventory', $inventory, Carbon::parse('next friday', 'America/Los_Angeles')->addHours(3)->addMinutes(59));
 
-    Cache::put('inventory', $uniqueInventory, Carbon::parse('next friday', 'America/Los_Angeles')->addHours(3)->addMinutes(59));
-
-    return $uniqueInventory;
+    return $inventory;
   }
 
   /**
@@ -51,17 +55,31 @@ class XurClient {
    * @return array
    */
   private function getItemHashes($inventoryHash) {
-    $itemHashes = [];
+    $items = [];
     $saleItemCategories = $inventoryHash['Response']['data']['saleItemCategories'];
     foreach($saleItemCategories as $itemCategory) {
+      $categoryName = $itemCategory['categoryTitle'];
       $saleItems = $itemCategory['saleItems'];
+      $items[$categoryName] = [];
       foreach($saleItems as $item) {
+        $costs = [];
         $hashId = (string)$item['item']['itemHash'];
-        $itemHashes[] = $hashId;
+        foreach($item['costs'] as $cost) {
+          $currency = $this->decodeItemHash($cost['itemHash']);
+          $costs[] = [
+            'value' => $cost['value'],
+            'currency' => $currency['itemName'],
+          ];
+        }
+        $items[$categoryName][] = [
+          'itemHash' => $hashId,
+          'itemCosts' => $costs,
+          'stackSize' => $item['item']['stackSize']
+        ];
       }
     }
 
-    return $itemHashes;
+    return $items;
   }
 
   /**
