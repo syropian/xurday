@@ -3,34 +3,53 @@
 namespace XurDay\Lib;
 
 use XurDay\Exceptions\XurNotPresentException;
-use GuzzleHttp\Client;
+use XurDay\Lib\HTTPClient;
 use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 
 class XurClient {
+
+  /**
+   * @var HTTPClient
+   */
   protected $client;
 
+  /**
+   * @param string $key
+   */
   public function __construct($key) {
-    $this->client = new Client([
-      'base_uri' => 'https://www.bungie.net/Platform/Destiny/',
-      'headers' => ['X-API-Key' => $key],
-    ]);
+    $this->client = new HTTPClient(
+      'https://www.bungie.net/Platform/Destiny/',
+      ['X-API-Key' => $key]
+    );
   }
 
+  /**
+   * @return array
+   */
   public function getInventory() {
-    $inventoryRes = $this->client->request('GET', 'Advisors/Xur/');
-    $inventoryHash = json_decode($inventoryRes->getBody()->getContents(), true);
-    // dd($inventoryHash);
+    $inventory = [];
+    $inventoryHash = $this->client->getJSON('Advisors/Xur/');
+
     if ($inventoryHash['ErrorStatus'] == 'DestinyVendorNotFound') {
       throw new XurNotPresentException();
     }
+
     $itemHashes = $this->getItemHashes($inventoryHash);
-    $decodedItemHashes = $this->decodeItemHashes($itemHashes);
-    $uniqueItemHashes = array_map('unserialize', array_unique(array_map('serialize', $decodedItemHashes)));
-    Cache::put('inventory', $uniqueItemHashes, Carbon::parse('next friday', 'America/Los_Angeles')->addHours(3)->addMinutes(59));
-    return $decodedItemHashes;
+    foreach($itemHashes as $hashId) {
+      $inventory[] = $this->decodeItemHash($hashId);
+    }
+    $uniqueInventory = array_map('unserialize', array_unique(array_map('serialize', $inventory)));
+
+    Cache::put('inventory', $uniqueInventory, Carbon::parse('next friday', 'America/Los_Angeles')->addHours(3)->addMinutes(59));
+
+    return $uniqueInventory;
   }
 
+  /**
+   * @param  array $inventoryHash
+   * @return array
+   */
   private function getItemHashes($inventoryHash) {
     $itemHashes = [];
     $saleItemCategories = $inventoryHash['Response']['data']['saleItemCategories'];
@@ -45,23 +64,14 @@ class XurClient {
     return $itemHashes;
   }
 
-  private function decodeItemHashes($itemHashes) {
-    $items = [];
-    foreach($itemHashes as $hashId) {
-      $hashRes = $this->client->request('GET', 'Manifest/6/'.$hashId);
-      $hashBody = json_decode($hashRes->getBody()->getContents(), true);
-      $itemName = $hashBody['Response']['data']['inventoryItem']['itemName'];
-      $itemType = $hashBody['Response']['data']['inventoryItem']['itemTypeName'];
-      $itemTier = $hashBody['Response']['data']['inventoryItem']['tierTypeName'];
-      $itemIcon = 'https://www.bungie.net'.$hashBody['Response']['data']['inventoryItem']['icon'];
-      $items[] = [
-        'name' => $itemName,
-        'type' => $itemType,
-        'tier' => $itemTier,
-        'icon' => $itemIcon
-      ];
-    }
+  /**
+   * @param  array $hash
+   * @return array
+   */
+  private function decodeItemHash($hashId) {
+    $itemRes = $this->client->getJSON('Manifest/6/'.$hashId);
 
-    return $items;
+    return $itemRes['Response']['data']['inventoryItem'];
   }
+
 }
