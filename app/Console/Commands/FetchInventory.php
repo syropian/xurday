@@ -39,14 +39,15 @@ class FetchInventory extends Command
      */
     public function handle()
     {
+      $this->info('Fetching inventory...');
       $key = config('services.bungie.key');
       $client = new XurClient($key);
       try {
         $client->getInventory();
-        $this->info('Inventory successfully cached!');
+        $this->info('Inventory successfully fetched & cached!');
       } catch(\Exception $e) {
         Log::error($e);
-        $this->error('Unable to fetch inventory.');
+        $this->error('Unable to fetch inventory. Check the logs for more information.');
       }
 
     }
