@@ -28,6 +28,8 @@ class XurClient {
    * @return array
    */
   public function getInventory() {
+    Cache::forget('inventory');
+
     $inventory = [];
     $inventoryHash = $this->client->getJSON('Advisors/Xur/');
 
@@ -45,7 +47,7 @@ class XurClient {
         ];
       }
     }
-    Cache::put('inventory', $inventory, Carbon::parse('next friday', 'America/Los_Angeles')->addHours(3)->addMinutes(59));
+    Cache::forever('inventory', $inventory);
 
     return $inventory;
   }
@@ -57,10 +59,13 @@ class XurClient {
   private function getItemHashes($inventoryHash) {
     $items = [];
     $saleItemCategories = $inventoryHash['Response']['data']['saleItemCategories'];
+
+    // Iterate over each category of item (Curios, Material Exchange, Exotic Gear)
     foreach($saleItemCategories as $itemCategory) {
       $categoryName = $itemCategory['categoryTitle'];
       $saleItems = $itemCategory['saleItems'];
       $items[$categoryName] = [];
+      // Grab the item hash and its cost data
       foreach($saleItems as $item) {
         $costs = [];
         $hashId = (string)$item['item']['itemHash'];
@@ -71,6 +76,7 @@ class XurClient {
             'currency' => $currency['itemName'],
           ];
         }
+        // Tack on the stack size as well
         $items[$categoryName][] = [
           'itemHash' => $hashId,
           'itemCosts' => $costs,
