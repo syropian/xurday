@@ -5,7 +5,7 @@ namespace XurDay\Lib;
 use XurDay\Exceptions\XurNotPresentException;
 use XurDay\Lib\HTTPClient;
 use Illuminate\Support\Facades\Cache;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class XurClient {
 
@@ -94,7 +94,6 @@ class XurClient {
    */
   private function decodeItemHash($hashId) {
     $itemRes = $this->client->getJSON('Manifest/6/'.$hashId);
-
     return $itemRes['Response']['data']['inventoryItem'];
   }
 

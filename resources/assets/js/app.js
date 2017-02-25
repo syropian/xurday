@@ -1,20 +1,21 @@
-
-/**
- * First we will load all of this project's JavaScript dependencies which
- * includes Vue and other libraries. It is a great starting point when
- * building robust, powerful web applications using Vue and Laravel.
- */
-
-require('./bootstrap');
-
-/**
- * Next, we will create a fresh Vue application instance and attach it to
- * the page. Then, you may begin adding components to this application
- * or customize the JavaScript scaffolding to fit your unique needs.
- */
-
-Vue.component('example', require('./components/Example.vue'));
-
-const app = new Vue({
-    el: '#app'
-});
+import moment from 'moment';
+import countdown from 'countdown';
+import momentCountdown from 'moment-countdown';
+(function() {
+  const $el = document.querySelector('.countdown');
+  const arrival = $el.dataset.arrival;
+  const departure = $el.dataset.departure;
+  const present = !!$el.dataset.present;
+  let countdown;
+  if (present) {
+    setInterval(function () {
+      countdown = moment(departure).countdown().toString();
+      $el.textContent = `will depart in ${countdown}`;
+    }, 1000);
+  } else {
+    setInterval(function () {
+      countdown = moment(arrival).countdown().toString();
+      $el.textContent = `will arrive in ${countdown}`;
+    }, 1000);
+  }
+})()
