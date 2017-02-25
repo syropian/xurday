@@ -98,3 +98,9 @@ body {
     }
   }
 }
+
+@media screen and (max-width: 767px) {
+  .inventory-container .inventory-items .inventory-item {
+    flex-basis: calc(50% - 20px);
+  }
+}
