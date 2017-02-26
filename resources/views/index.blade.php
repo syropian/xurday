@@ -21,7 +21,7 @@
               <li class="inventory-item">
                 <a href="https://bungie.net/en/Armory/Detail?item={{ $item['item']['itemHash'] }}" target="_blank" rel="noopener">
                   <span class="icon-wrap">
-                    <img src="https://bungie.net/{{ $item['item']['icon'] }}" alt="{{ $item['item']['itemName'] }}" class="inventory-item-icon" />
+                    <img src="https://bungie.net{{ $item['item']['icon'] }}" alt="{{ $item['item']['itemName'] }}" class="inventory-item-icon" />
                     @if($item['stackSize'] > 1)
                       <span class="item-stacks">{{ $item['stackSize'] }}</span>
                     @endif
