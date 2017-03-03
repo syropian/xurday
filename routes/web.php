@@ -8,10 +8,9 @@ use Illuminate\Support\Facades\Log;
 
 Route::get('/', function () {
   $inventory = Cache::get('inventory');
-
-  $departure = Carbon::parse('this sunday', 'America/Los_Angeles')->addHours(1);
-  $arrival = Carbon::parse('this friday', 'America/Los_Angeles')->addHours(1);
-  $present = $departure->lt($arrival) && Carbon::now('America/Los_Angeles')->lt($departure);
+  $arrival = Carbon::now('America/Los_Angeles')->startOfWeek()->addDays(4)->addHours(1);
+  $departure = Carbon::now('America/Los_Angeles')->startOfWeek()->addDays(6)->addHours(1);
+  $present = Carbon::now('America/Los_Angeles')->between($arrival, $departure);
 
   return view('index', [
     'inventory' => $inventory,
