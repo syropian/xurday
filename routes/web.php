@@ -20,15 +20,3 @@ Route::get('/', function () {
     'location' => $location
   ]);
 });
-
-Route::post('/location', function (Request $request) {
-  if (request('token') === config('app.token')) {
-    Cache::forget('location');
-    $location = request('body');
-    Cache::put('location', $location, Carbon::parse('next friday', 'America/Los_Angeles')->addHours(1));
-
-    return response()->json(['status' => 'success'], 200);
-  } else {
-    return response()->json(['status' => 'forbidden'], 403);
-  }
-});
