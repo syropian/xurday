@@ -13,6 +13,7 @@
       <h1>Xûr</h1>
       <h2>Agent of the Nine</h2>
       <div class="countdown" data-arrival="{{ $arrival }}" data-departure="{{ $departure }}" data-present="{{ $present }}"></div>
+      <p>{{ $location }}</p>
       <div class="inventory-container">
         @foreach ($inventory as $category => $items)
           <h3 class="inventory-category">{{ $category }}</h3>

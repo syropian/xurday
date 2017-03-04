@@ -12,7 +12,7 @@ return [
     | any other location as required by the application or its packages.
     */
 
-    'name' => 'Laravel',
+    'name' => 'XurDay',
 
     /*
     |--------------------------------------------------------------------------
@@ -104,6 +104,8 @@ return [
     */
 
     'key' => env('APP_KEY'),
+
+    'token' => env('ACCESS_TOKEN'),
 
     'cipher' => 'AES-256-CBC',
 
