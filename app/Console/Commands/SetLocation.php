@@ -42,5 +42,6 @@ class SetLocation extends Command
       Cache::forget('location');
       $location = $this->ask('Where is Xur this week?');
       Cache::put('location', $location, Carbon::parse('next friday', 'America/Los_Angeles')->addHours(1));
+      $this->info('Location successfully set. Happy Xur Day!');
     }
 }
