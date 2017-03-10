@@ -28,8 +28,6 @@ class XurClient {
    * @return array
    */
   public function getInventory() {
-    Cache::forget('inventory');
-
     $inventory = [];
     $inventoryHash = $this->client->getJSON('Advisors/Xur/');
 
