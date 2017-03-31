@@ -7,6 +7,11 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 Route::get('/', function () {
+  // $key = config('services.bungie.key');
+  // $client = new XurClient($key);
+  // $inventory = $client->getInventory();
+  // dd($inventory);
+
   $inventory = Cache::get('inventory');
   $location = Cache::get('location', 'Location Unknown...');
   $arrival = Carbon::now('America/Los_Angeles')->startOfWeek()->addDays(4)->addHours(1);

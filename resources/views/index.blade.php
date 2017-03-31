@@ -29,7 +29,9 @@
                   </span>
                   <span class="item-meta">
                     <h4 class="item-name">{{ $item['item']['itemName'] }}</h4>
+                    @if(array_key_exists('itemTypeName', $item['item']))
                     <p class="item-type">{{ $item['item']['itemTypeName'] }}</p>
+                    @endif
                   </span>
                 </a>
               </li>
